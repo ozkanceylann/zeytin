@@ -681,7 +681,7 @@ src="https://www.facebook.com/tr?id=1817216362901103&ev=PageView&noscript=1"
     var shipping=Number(selected.dataset.shipping);
     if(!Number.isInteger(amount)||!Number.isInteger(shipping)){error.textContent="Ürün fiyat bilgisi okunamadı.";return;}
     var paymentLabel=payment.value==="8"?"Kapıda Kredi Kartı İle":"Kapıda Nakit Ödeme";
-    var payload={ad_soyad:get("ad"),telefon:tel,sehir_ilce:province+" / "+district,sehir_kodu:provinceCode,ilce_kodu:districtCode,adres:get("adres"),urun:(selected.dataset.product||"Yeşil Zeytin")+" - "+selected.value,toplam_tutar:amount,kargo_tutar:shipping,odeme_sekli:paymentLabel,kargo_kg:Number(selected.dataset.weight||5),kargo_adet:selected.dataset.parcels||"1"};
+    var payload={ad_soyad:get("ad"),telefon:tel,sehir_ilce:province+" / "+district,sehir_kodu:provinceCode,ilce_kodu:districtCode,adres:get("adres"),urun:(selected.dataset.product||"Siyah Zeytin")+" - "+selected.value,toplam_tutar:amount,kargo_tutar:shipping,odeme_sekli:paymentLabel,kargo_kg:Number(selected.dataset.weight||5),kargo_adet:selected.dataset.parcels||"1"};
     var receiptToken="";
     try{receiptToken=window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():"";}catch(ignore){}
     if(!receiptToken){error.textContent="Sipariş bilgilerini güvenli şekilde göstermek için tarayıcınızı güncelleyin.";return;}
