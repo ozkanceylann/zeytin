@@ -172,6 +172,13 @@ src="https://www.facebook.com/tr?id=1817216362901103&ev=PageView&noscript=1"
     font-size: 15px;
 }
 .smart-forms .gui-textarea { min-height: 92px; padding-top: 12px; }
+.smart-forms .gui-input::placeholder, .smart-forms .gui-textarea::placeholder { color: #aaa; opacity: 1; }
+.smart-forms .gui-input::-webkit-input-placeholder, .smart-forms .gui-textarea::-webkit-input-placeholder { color: #aaa; }
+.smart-forms .gui-input::-moz-placeholder, .smart-forms .gui-textarea::-moz-placeholder { color: #aaa; opacity: 1; }
+.smart-forms .gui-input:-ms-input-placeholder, .smart-forms .gui-textarea:-ms-input-placeholder { color: #aaa; }
+.delivery-fields .order-note-field { grid-column: 1 / -1; }
+.delivery-fields .order-note-field label { display:block; margin:0 0 5px; color:#555; font-size:13px; font-weight:600; }
+.delivery-fields .order-note-field .gui-textarea { min-height:82px; padding:10px; border:1px solid #e2cf55; border-radius:4px; background:#fff8cf; }
 .address-note {
     padding: 9px 10px;
     border: 1px solid #d8d8d8;
@@ -395,6 +402,7 @@ src="https://www.facebook.com/tr?id=1817216362901103&ev=PageView&noscript=1"
                 <div class="field"><input class="gui-input" type="text" id="order-district" name="ilce" autocomplete="address-level2" placeholder="Önce il seçin" aria-label="İlçe" aria-autocomplete="list" aria-controls="district-suggestions" aria-expanded="false" disabled required><div class="place-suggestions" id="district-suggestions" role="listbox" hidden></div></div>
               </div>
               <div class="section address-field"><label class="sr-only" for="order-address">Adresiniz</label><div class="field"><textarea class="gui-textarea" id="order-address" name="adres" autocomplete="street-address" maxlength="1000" placeholder="Adresiniz"></textarea><div class="address-note">Not: Lütfen adresinizi eksiksiz bir şekilde yazınız...</div></div></div>
+              <div class="section order-note-field"><label for="order-note">Notunuz</label><div class="field"><textarea class="gui-textarea" id="order-note" name="siparis_notu" maxlength="1000" placeholder="Varsa sipariş notunuzu yazın"></textarea></div></div>
             </div>
           </div>
           <div class="section sozlesme"><label class="option"><input type="checkbox" name="generalTerms" id="generalTerms"><span class="checkbox"></span><span class="sozlesmeyazi"><a href="sayfalar/gizlilik-guvenlik.html">Gizlilik ve Güvenlik Bilgilendirmesi</a>'ni okudum; <a href="sayfalar/satis-sozlesmesi.html">Mesafeli Satış Sözleşmesi</a>'ni kabul ediyorum.</span></label></div>
@@ -656,7 +664,7 @@ src="https://www.facebook.com/tr?id=1817216362901103&ev=PageView&noscript=1"
     var shipping=Number(selected.dataset.shipping);
     if(!Number.isInteger(amount)||!Number.isInteger(shipping)){error.textContent="Ürün fiyat bilgisi okunamadı.";return;}
     var paymentLabel=payment.value==="8"?"Kapıda Kredi Kartı İle":"Kapıda Nakit Ödeme";
-    var payload={ad_soyad:get("ad"),telefon:tel,sehir_ilce:province+" / "+district,sehir_kodu:provinceCode,ilce_kodu:districtCode,adres:get("adres"),urun:(selected.dataset.product||"Siyah Zeytin")+" - "+selected.value,toplam_tutar:amount,kargo_tutar:shipping,odeme_sekli:paymentLabel,kargo_kg:Number(selected.dataset.weight||5),kargo_adet:selected.dataset.parcels||"1"};
+    var payload={ad_soyad:get("ad"),telefon:tel,sehir_ilce:province+" / "+district,sehir_kodu:provinceCode,ilce_kodu:districtCode,adres:get("adres"),urun:(selected.dataset.product||"Siyah Zeytin")+" - "+selected.value,toplam_tutar:amount,kargo_tutar:shipping,odeme_sekli:paymentLabel,kargo_kg:Number(selected.dataset.weight||5),kargo_adet:selected.dataset.parcels||"1",notlar:get("siparis_notu")};
     var receiptToken="";
     try{receiptToken=window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():"";}catch(ignore){}
     if(!receiptToken){error.textContent="Sipariş bilgilerini güvenli şekilde göstermek için tarayıcınızı güncelleyin.";return;}
@@ -680,8 +688,10 @@ src="https://www.facebook.com/tr?id=1817216362901103&ev=PageView&noscript=1"
       var product=shown.urun||payload.urun;
       var total=shown.toplam_tutar||payload.toplam_tutar;
       var paymentText=shown.odeme_sekli||payload.odeme_sekli;
+      var orderNote=shown.notlar||payload.notlar;
+      var orderNoteHtml=orderNote?'<p style="margin:6px 0"><strong>Notunuz:</strong> '+escapeHtml(orderNote)+'</p>':"";
       var numberNotice=shown.siparis_no==null?'<p style="color:#805500;margin:0 0 12px">Sipariş numarası şu anda yüklenemedi. Siparişiniz alındı; WhatsApp’tan bize ulaşabilirsiniz.</p>':"";
-      form.innerHTML='<section style="padding:18px;border:1px solid #d7e6d8;border-radius:12px;background:#f7fbf7;text-align:left"><h2 style="text-align:center;margin:0 0 8px;color:#245b2a">Siparişiniz alındı</h2><p style="text-align:center;font-size:18px;margin:0 0 16px"><strong>Sipariş numaranız: '+escapeHtml(orderNo)+'</strong></p>'+numberNotice+'<div style="line-height:1.6"><p style="margin:6px 0"><strong>Ad Soyad:</strong> '+escapeHtml(customer)+'</p><p style="margin:6px 0"><strong>Telefon:</strong> '+escapeHtml(phone)+'</p><p style="margin:6px 0"><strong>Adres:</strong> '+escapeHtml(fullAddress)+'</p><p style="margin:6px 0"><strong>Ürün:</strong> '+escapeHtml(product)+'</p><p style="margin:6px 0"><strong>Tutar:</strong> '+escapeHtml(total)+' TL · '+escapeHtml(paymentText)+'</p></div><p style="margin:14px 0 8px;text-align:center">Sipariş bilgileriniz bize ulaştı.</p><a class="button btn-primary" style="display:block;text-align:center" target="_blank" rel="noopener" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent("Zeytin siparişim hakkında yazıyorum")+'">WhatsApp’tan yaz</a></section>';
+      form.innerHTML='<section style="padding:18px;border:1px solid #d7e6d8;border-radius:12px;background:#f7fbf7;text-align:left"><h2 style="text-align:center;margin:0 0 8px;color:#245b2a">Siparişiniz alındı</h2><p style="text-align:center;font-size:18px;margin:0 0 16px"><strong>Sipariş numaranız: '+escapeHtml(orderNo)+'</strong></p>'+numberNotice+'<div style="line-height:1.6"><p style="margin:6px 0"><strong>Ad Soyad:</strong> '+escapeHtml(customer)+'</p><p style="margin:6px 0"><strong>Telefon:</strong> '+escapeHtml(phone)+'</p><p style="margin:6px 0"><strong>Adres:</strong> '+escapeHtml(fullAddress)+'</p>'+orderNoteHtml+'<p style="margin:6px 0"><strong>Ürün:</strong> '+escapeHtml(product)+'</p><p style="margin:6px 0"><strong>Tutar:</strong> '+escapeHtml(total)+' TL · '+escapeHtml(paymentText)+'</p></div><p style="margin:14px 0 8px;text-align:center">Sipariş bilgileriniz bize ulaştı.</p><a class="button btn-primary" style="display:block;text-align:center" target="_blank" rel="noopener" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent("Zeytin siparişim hakkında yazıyorum")+'">WhatsApp’tan yaz</a></section>';
       form.scrollIntoView({behavior:"smooth",block:"start"});
     })
     .catch(function(){btn.disabled=false;btn.textContent="SİPARİŞİ ONAYLA";error.textContent="Sipariş gönderilemedi. Lütfen tekrar deneyin veya WhatsApp’tan bize ulaşın.";});
